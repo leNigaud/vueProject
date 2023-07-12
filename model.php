@@ -21,6 +21,47 @@
         print(json_encode($data));
     }
 
+    else if($dataReceived->action == 'getall') {
+
+        // moyenneClasse query
+        $query = "SELECT AVG((note_math + note_phys) / 2) as moyenneClasse FROM etudiant";
+        $statement = $conn->query($query);
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
+        $moyenneClasse = $result['moyenneClasse'];
+    
+        // Min and Max query
+        $query = "SELECT MIN((note_math + note_phys) / 2) as MinMoyenne, MAX((note_math + note_phys) / 2) as MaxMoyenne FROM etudiant";
+        $statement = $conn->query($query);
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
+        $minMoyenne = $result['MinMoyenne'];
+        $maxMoyenne = $result['MaxMoyenne'];
+    
+        // Number of redoublants query
+        $query = "SELECT COUNT(*) as NumberRedoublants FROM etudiant WHERE ((note_math + note_phys) / 2) < 10";
+        $statement = $conn->query($query);
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
+        $numberRedoublants = $result['NumberRedoublants'];
+    
+        // Number of admis query
+        $query = "SELECT COUNT(*) as NumberAdmis FROM etudiant WHERE ((note_math + note_phys) / 2) >= 10";
+        $statement = $conn->query($query);
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
+        $numberAdmis = $result['NumberAdmis'];
+    
+        // Put all results into one array
+        $data = array(
+            'moyenneClasse' => $moyenneClasse,
+            'minMoyenne' => $minMoyenne,
+            'maxMoyenne' => $maxMoyenne,
+            'numberRedoublants' => $numberRedoublants,
+            'numberAdmis' => $numberAdmis,
+        );
+    
+        // Convert to JSON and print
+        print(json_encode($data));
+    }
+    
+
     else if($dataReceived->action == 'insert') {
         $numEt = $dataReceived->numEt;
         $nom = $dataReceived->nom;
