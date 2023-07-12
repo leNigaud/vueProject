@@ -1,1 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VueProject</title>
+</head>
+<body>
+    <div id="app">
+        <div>
+           <table>
+                <tr>
+                    <th v-for="titre in head">{{titre}}</th>
+                </tr>
+                <tr v-for="etudiant in etudiants">
+                    <td v-for="elem in etudiant">{{elem}}</td>
+                    <td><button>Modifier</button></td>
+                    <td><button>Supprimer</button></td>
+                </tr>
+           </table>
+       </div>
+    </div>
+    <script src="vue.js"></script>
+    <script src="axios.min.js"></script>
+    <script type="text/javascript">
+        var app = new Vue({
+            el : "#app",
+            data : {
+                head : ["Numero de l'élève","Nom de l'élève ","Note de math",'Note de phys'],
+                etudiants : [
+                    {numEt : "4456" , nom : "Andry", note_math : 15 , note_phys : 15},
+                    {numEt : "645645" , nom : "Ary", note_math : 15 , note_phys : 15},
+                    {numEt : "456" , nom : "Leo", note_math : 15 , note_phys : 15},
+                    {numEt : "456" , nom : "Pen", note_math : 15 , note_phys : 15},
+                ]
+            },
+            
+            methods: {
+                getEtudiants() {
+                    axios.post('model.php', 
+                    {
+                        action: 'fetchall'
+                    })
+                    .then(function (response){
+                        console.log(response.data)
+                        app.etudiants = response.data;
+                    })
+                    .catch(function (error) {
+					console.log(error);
+				});
+                }
+            },
+            mounted() {
+                this.getEtudiants()
+            }
+            
+
+        })
+    </script>
+</body>
+</html>
 
