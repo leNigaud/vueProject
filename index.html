@@ -40,6 +40,7 @@
                 </tr>
                 <tr v-for="(etudiant,i) in etudiants">
                     <td v-for="elem in etudiant">{{elem}}</td>
+                    <td>{{(etudiants[i].note_math+etudiants[i].note_phys)/2}}</td>
                     <td><button v-on:click="modify(i)">Modifier</button></td>
                     <td><button v-on:click="suppr(i)">Supprimer</button></td>
                 </tr>
@@ -54,7 +55,7 @@
         var app = new Vue({
             el : "#app",
             data : {
-                head : ["Numero de l'élève","Nom de l'élève ","Note de math",'Note de phys', 'Modification', 'Suppression'],
+                head : ["Numero de l'élève","Nom de l'élève ","Note de math",'Note de phys','Moyenne', 'Modification', 'Suppression'],
                 etudiants : [
                     {numEt : "11" , nom : "Andry", note_math : 44 , note_phys : 55},
                     {numEt : "22" , nom : "Ary", note_math : 66 , note_phys : 77},
@@ -67,6 +68,11 @@
                 note_phys: '',
                 modifier : false,
                 todo : 'Ajouter',
+                Num_Avant : null,
+                Nom_Avant : null,
+                math_Avant : null,
+                phys_Avant : null,
+                idx : null,
             },
             
             methods: {
@@ -159,18 +165,25 @@
                     this.numEt = this.etudiants[indice].numEt
                     this.note_math = this.etudiants[indice].note_math
                     this.note_phys = this.etudiants[indice].note_phys
+                    this.Nom_Avant = this.etudiants[indice].nom
+                    this.Num_Avant = this.etudiants[indice].numEt
+                    this.math_Avant = this.etudiants[indice].note_math
+                    this.phys_Avant = this.etudiants[indice].note_phys
                     this.todo = 'Modifier'
                     this.modifier = true
+                    this.idx = indice
                 },
 
                 boutonMA : function(){
                     if(this.modifier){
                         // atao refa modifier
+                        this.updateEtudiant(this.Num_Avant,this.idx)
                     }
                     else {
                         // atao refa ajouter
                         this.addEtudiant()
                     }
+                    this.reset()
                 },
 
                 reset : function(){
@@ -179,11 +192,18 @@
                     this.note_math = null,
                     this.note_phys = null,
                     this.modifier = false
-                    this.todo = 'Ajouter'
+                    this.Nom_Avant = '',
+                    this.Num_Avant = null,
+                    this.math_Avant = null,
+                    this.phys_Avant = null,
+                    this.modifier = false,
+                    this.todo = 'Ajouter',
+                    this.idx = null
                 },
 
                 suppr : function(indice){
                     // atao @le supprimer
+                    this.deleteEtudiant(this.etudiants[indice], indice)
                 }
             },
             mounted() {
