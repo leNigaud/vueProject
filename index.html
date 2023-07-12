@@ -44,6 +44,14 @@
                 </tr>
            </table>
        </div>
+
+       <div>
+            <p>Moyenne de classe: {{ infos.moyenneClasse}} </p>
+            <p>Moyenne maximale: {{ infos.maxMoyenne}} </p>
+            <p>Moyenne minimale: {{ infos.minMoyenne}} </p>
+            <p>Nombre de redoublants: {{ infos.numberRedoublants}} </p>
+            <p>Nombre d'admis: {{ infos.numberAdmis}} </p>
+       </div>
     </div>
 
     <script src="vue.js"></script>
@@ -70,10 +78,19 @@
                     nom: '^[a-zA-Z]+$',
                     note_math: '^([01]?[0-9](\.[0-9]{1,2})?|20(\.0{1,2})?)$',
                     note_phys: '^([01]?[0-9](\.[0-9]{1,2})?|20(\.0{1,2})?)$'
+                },
+
+                infos: {
+                    moyenneClasse:'',
+                    minMoyenne: '',
+                    maxMoyenne: '',
+                    numberRedoublants: '',
+                    numberAdmis: ''
                 }
             },
             
             methods: {
+                
                 getEtudiants() {
                     axios.post('/model.php', 
                     {
@@ -87,6 +104,21 @@
 					console.log(error);
 				});
                 },
+                
+                getInfos() {
+                    axios.post('/model.php', 
+                    {
+                        action: 'getall'
+                    })
+                    .then(function (response){
+                        console.log(response.data)
+                        app.infos = response.data;
+                    })
+                    .catch(function (error) {
+					console.log(error);
+				});
+                },
+
                 createEtudiant() {
                     return {
                         numEt: app.numEt,
@@ -187,6 +219,7 @@
             },
             mounted() {
                 this.getEtudiants()
+                this.getInfos()
             }
             
 
