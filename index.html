@@ -19,7 +19,7 @@
 <body>
     <div id="app">
         <h1>Ajouter des données de l'étudiant</h1>
-        <form @submit.prevent> 
+        <form ref="form" @submit.prevent> 
             <label for="numEt">Numéro :</label>
             <input type="text" name="numEt" id="numEt" v-model="numEt" :pattern="pattern.numEt" required><br>
             <label for="nom">Nom :</label>
@@ -40,7 +40,7 @@
                 </tr>
                 <tr v-for="(etudiant,i) in etudiants">
                     <td v-for="elem in etudiant">{{elem}}</td>
-                    <td>{{(etudiants[i].note_math+etudiants[i].note_phys)/2}}</td>
+                    <td>{{ toNumber((toNumber(etudiants[i].note_math) + toNumber(etudiants[i].note_phys))/2) }}</td>
                     <td><button v-on:click="modify(i)">Modifier</button></td>
                     <td><button v-on:click="suppr(i)">Supprimer</button></td>
                 </tr>
@@ -75,6 +75,7 @@
                 nom: '',
                 note_math: '',
                 note_phys: '',
+
                 modifier : false,
                 todo : 'Ajouter',
                 Num_Avant : null,
@@ -160,6 +161,7 @@
                         })
                         .then((response) =>{
                             app.etudiants.push(etudiant)
+                            app.getInfos()
                             this.resetForm()
                         })
                         .catch(function(error) {
@@ -168,28 +170,6 @@
                         this.resetForm();
                     } else {
                         console.log('Form validation failed');
-                        // const form = this.$refs.form;
-                        // const numEtInput = form.elements.numEt;
-                        // const nomInput = form.elements.nom;
-                        // const noteMathInput = form.elements.note_math;
-                        // const notePhysInput = form.elements.note_phys;
-
-                        // if (!numEtInput.validity.valid) {
-                        //     numEtInput.setCustomValidity('Entrez un nombre s\'il vous plaît');
-                        // }
-
-                        // if (!nomInput.validity.valid) {
-                        //     nomInput.setCustomValidity('Entrez un nom sans caractères spéciales');
-                        // }
-
-                        // if (!noteMathInput.validity.valid) {
-                        //     noteMathInput.setCustomValidity('Entrez une note entre 0 et 20');
-                        // }
-
-                        // if (!notePhysInput.validity.valid) {
-                        //     notePhysInput.setCustomValidity('Entrez une note entre 0 et 20');
-                        // }
-                        // form.reportValidity();
                     }
                 },
 
@@ -208,6 +188,7 @@
                     })
                     .then((response)=>{
                         app.etudiants.splice(index,1 , etudiant)
+                        app.getInfos()
                         this.resetForm()
                     })
                     .catch(function(error) {
@@ -218,10 +199,13 @@
                 deleteEtudiant(num, index) {
                     axios.post('/model.php',
                     {
+                        action: 'delete',
                         numEt: num
                     })
                     .then(function(response){
                         app.etudiants.splice(index, 1)
+                        app.getInfos()
+
                     })
                     .catch(function(error) {
                         console.log(error)
@@ -234,7 +218,7 @@
                     this.note_math = this.etudiants[indice].note_math
                     this.note_phys = this.etudiants[indice].note_phys
                     this.Nom_Avant = this.etudiants[indice].nom
-                    this.Num_Avant = this.etudiants[indice].numEt
+                    app.Num_Avant = app.etudiants[indice].numEt
                     this.math_Avant = this.etudiants[indice].note_math
                     this.phys_Avant = this.etudiants[indice].note_phys
                     this.todo = 'Modifier'
@@ -245,11 +229,11 @@
                 boutonMA : function(){
                     if(this.modifier){
                         // atao refa modifier
-                        this.updateEtudiant(this.Num_Avant,this.idx)
+                        app.updateEtudiant(app.Num_Avant,app.idx)
                     }
                     else {
                         // atao refa ajouter
-                        this.addEtudiant()
+                        app.addEtudiant()
                     }
                     this.reset()
                 },
@@ -261,7 +245,7 @@
                     this.note_phys = null,
                     this.modifier = false
                     this.Nom_Avant = '',
-                    this.Num_Avant = null,
+                    app.Num_Avant = null,
                     this.math_Avant = null,
                     this.phys_Avant = null,
                     this.modifier = false,
@@ -271,14 +255,19 @@
 
                 suppr : function(indice){
                     // atao @le supprimer
-                    this.deleteEtudiant(this.etudiants[indice], indice)
-                }
+                    app.deleteEtudiant(app.etudiants[indice].numEt, indice)
+                },
+                toNumber(value) {
+                    return parseFloat(value);
+                },
             },
             mounted() {
                 this.getEtudiants()
                 this.getInfos()
-
+            
             }
+            
+            
             
 
         })

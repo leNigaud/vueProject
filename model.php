@@ -75,14 +75,15 @@
     }
 
     else if($dataReceived->action == 'update') {
-        $ancientNum = $dataReceived->$ancientNum;
+        
+        $ancientNum = $dataReceived->ancientNum;
         $numEt = $dataReceived->numEt;
         $nom = $dataReceived->nom;
         $note_math = $dataReceived->note_math;
         $note_phys = $dataReceived->note_phys;        
 
-        $statement = $conn->prepare($query);
         $query = "UPDATE etudiant SET numEt=?, nom=?, note_math=?, note_phys=? WHERE numEt=?";
+        $statement = $conn->prepare($query);
 
         $statement->execute([$numEt, $nom, $note_math, $note_phys, $ancientNum]);
 
