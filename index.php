@@ -6,21 +6,25 @@
     <title>Projet Vue</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
+    <link rel='stylesheet' type='text/css' href='style.css'>
     <script src='main.js'></script>
 </head>
 <body>
+    <h1>Gestion des étudiants</h1>
     <div id="app">
-        <form v-on:submit.prevent="ajouterEtudiant">
-            <div v-for="x in colonne">
-                <label v-bind:for="x.name">{{ x.label }} :</label>
-                <input type="text" v-bind:name="x.name" v-model="x.value"  v-bind:pattern="x.pattern" required >
-                <br><br>
-                <div class="line-break"></div>
-            </div>
-            <button type="submit">Ajouter</button>
-        </form>
+        <div class="champs">
+            <form v-on:submit.prevent="ajouterEtudiant">
+                <div v-for="x in colonne">
+                    <label v-bind:for="x.name">{{ x.label }} :</label>
+                    <input type="text" v-bind:name="x.name" v-model="x.value"  v-bind:pattern="x.pattern" required >
+                    <br><br>
+                    <div class="line-break"></div>
+                </div>
+                <button type="submit">Ajouter</button>
+            </form>
+        </div>    
 
-        <div>
+        <div class="tableau">
            <table>
                 <tr>
                     <th v-for="titre in head">{{titre}}</th>
@@ -34,12 +38,7 @@
        </div>
 
 
-        <div>
-            <p>Liste des étudiants</p>
-            <ul>
-              <li v-for="etudiant in etudiants"> numEt: {{ etudiant.num }} , nom: {{ etudiant.nom }} , note_math: {{ etudiant.math }} , note_phys: {{ etudiant.phys }}</li>
-            </ul>
-        </div>
+        
 
         <script src="vue.js"></script>
         <script>
