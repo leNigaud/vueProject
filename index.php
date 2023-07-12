@@ -23,7 +23,7 @@
         <div>
             <p>Liste des étudiants</p>
             <ul>
-              <li v-for="etudiant in etudiants">{{ etudiant.num }}, {{ etudiant.nom}} , {{etudiant.math}} ,{{ etudiant.phys }}</li>
+              <li v-for="etudiant in etudiants"> numEt: {{ etudiant.num }} , nom: {{ etudiant.nom }} , note_math: {{ etudiant.math }} , note_phys: {{ etudiant.phys }}</li>
             </ul>
         </div>
 
@@ -33,10 +33,10 @@
                 el:'#app',
                 data: {
                     colonne: [
-                        { name: 'numEt', value:"numEt",label: "Numéro de l'étudiant", value: '' },
-                        { name: 'nom', value:"nom",label:"Nom de l'étudiant", value: '' },
-                        { name: 'note_math', value: "note_math",label: 'Note en mathématique', value: '' },
-                        { name: 'note_phys', value: "note_phys",label: 'Note en physique', value: '' },
+                        { name: 'numEt',label: "Numéro de l'étudiant", value: '' },
+                        { name: 'nom',label:"Nom de l'étudiant", value: '' },
+                        { name: 'note_math',label: 'Note en mathématique', value: '' },
+                        { name: 'note_phys',label: 'Note en physique', value: '' },
                     ],
                 
                     etudiants:[]
