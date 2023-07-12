@@ -21,13 +21,13 @@
         <h1>Ajouter des données de l'étudiant</h1>
         <form @submit.prevent> 
             <label for="numEt">Numéro :</label>
-            <input type="text" name="numEt" id="numEt" v-model="numEt" required><br>
+            <input type="text" name="numEt" id="numEt" v-model="numEt" :pattern="pattern.numEt" required><br>
             <label for="nom">Nom :</label>
-            <input type="text" name="nom" id="nom" v-model="nom" required><br>
+            <input type="text" name="nom" id="nom" v-model="nom" required :pattern="pattern.nom"><br>
             <label for="note_math">Note Maths :</label>
-            <input type="text" name="note_math" id="note_math" v-model="note_math" required><br>
+            <input type="text" name="note_math" id="note_math" v-model="note_math" required :pattern="pattern.note_math"><br>
             <label for="note_phys">Note Physique :</label>
-            <input type="text" name="note_phys" id="note_phys" v-model="note_phys" required><br>
+            <input type="text" name="note_phys" id="note_phys" v-model="note_phys" required :pattern="pattern.note_phys"><br>
             
             <button type="submit" @click="boutonMA">{{todo}}</button>          
             <button type="submit" @click="reset">Reset</button>          
@@ -46,6 +46,15 @@
                 </tr>
            </table>
        </div>
+
+       <div>
+            <p>Moyenne de classe: {{ infos.moyenneClasse}} </p>
+            <p>Moyenne maximale: {{ infos.maxMoyenne}} </p>
+            <p>Moyenne minimale: {{ infos.minMoyenne}} </p>
+            <p>Nombre de redoublants: {{ infos.numberRedoublants}} </p>
+            <p>Nombre d'admis: {{ infos.numberAdmis}} </p>
+        </div>
+
     </div>
 
     <script src="vue.js"></script>
@@ -73,6 +82,21 @@
                 math_Avant : null,
                 phys_Avant : null,
                 idx : null,
+
+                pattern:{ 
+                    numEt: '^[0-9]+$',
+                    nom: '^[a-zA-Z]+$',
+                    note_math: '^([01]?[0-9](\.[0-9]{1,2})?|20(\.0{1,2})?)$',
+                    note_phys: '^([01]?[0-9](\.[0-9]{1,2})?|20(\.0{1,2})?)$'
+                },
+
+                infos: {
+                    moyenneClasse:'',
+                    minMoyenne: '',
+                    maxMoyenne: '',
+                    numberRedoublants: '',
+                    numberAdmis: ''
+                }
             },
             
             methods: {
@@ -89,6 +113,22 @@
 					console.log(error);
 				});
                 },
+
+                
+                getInfos() {
+                    axios.post('/model.php', 
+                    {
+                        action: 'getall'
+                    })
+                    .then(function (response){
+                        console.log(response.data)
+                        app.infos = response.data;
+                    })
+                    .catch(function (error) {
+					console.log(error);
+				});
+                },
+
                 createEtudiant() {
                     return {
                         numEt: app.numEt,
@@ -102,27 +142,55 @@
                     app.numEt = '',
                     app.nom = '',
                     app.note_math = '',
-                    app.note_phys = ''
+                    app.note_phys = '',
+                    this.$refs.form.reset();
+
                 },
 
                 addEtudiant() {
+                    if (this.$refs.form.checkValidity()) {
                     let etudiant = this.createEtudiant()
+                        axios.post('/model.php',
+                        {
+                            action: 'insert',
+                            numEt: app.numEt,
+                            nom: app.nom,
+                            note_math: app.note_math,
+                            note_phys: app.note_phys
+                        })
+                        .then((response) =>{
+                            app.etudiants.push(etudiant)
+                            this.resetForm()
+                        })
+                        .catch(function(error) {
+                            console.log(error)
+                        })
+                        this.resetForm();
+                    } else {
+                        console.log('Form validation failed');
+                        // const form = this.$refs.form;
+                        // const numEtInput = form.elements.numEt;
+                        // const nomInput = form.elements.nom;
+                        // const noteMathInput = form.elements.note_math;
+                        // const notePhysInput = form.elements.note_phys;
 
-                    axios.post('/model.php',
-                    {
-                        action: 'insert',
-                        numEt: app.numEt,
-                        nom: app.nom,
-                        note_math: app.note_math,
-                        note_phys: app.note_phys
-                    })
-                    .then((response) =>{
-                        app.etudiants.push(etudiant)
-                        this.resetForm()
-                    })
-                    .catch(function(error) {
-                        console.log(error)
-                    })
+                        // if (!numEtInput.validity.valid) {
+                        //     numEtInput.setCustomValidity('Entrez un nombre s\'il vous plaît');
+                        // }
+
+                        // if (!nomInput.validity.valid) {
+                        //     nomInput.setCustomValidity('Entrez un nom sans caractères spéciales');
+                        // }
+
+                        // if (!noteMathInput.validity.valid) {
+                        //     noteMathInput.setCustomValidity('Entrez une note entre 0 et 20');
+                        // }
+
+                        // if (!notePhysInput.validity.valid) {
+                        //     notePhysInput.setCustomValidity('Entrez une note entre 0 et 20');
+                        // }
+                        // form.reportValidity();
+                    }
                 },
 
                 updateEtudiant(ancien, index) {
@@ -208,6 +276,8 @@
             },
             mounted() {
                 this.getEtudiants()
+                this.getInfos()
+
             }
             
 
