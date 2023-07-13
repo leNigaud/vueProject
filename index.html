@@ -1,1 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 5px;
+        }
+    </style>
+
+    <title>VueProject</title>
+</head>
+<body>
+    <div id="app">
+        <h1>Ajouter des données de l'étudiant</h1>
+        <form @submit.prevent> 
+            <label for="numEt">Numéro :</label>
+            <input type="text" name="numEt" id="numEt" v-model="numEt" required><br>
+            <label for="nom">Nom :</label>
+            <input type="text" name="nom" id="nom" v-model="nom" required><br>
+            <label for="note_math">Note Maths :</label>
+            <input type="text" name="note_math" id="note_math" v-model="note_math" required><br>
+            <label for="note_phys">Note Physique :</label>
+            <input type="text" name="note_phys" id="note_phys" v-model="note_phys" required><br>
+            
+            <button type="submit" @click="boutonMA">{{todo}}</button>          
+            <button type="submit" @click="reset">Reset</button>          
+        </form>
+        
+        <div>
+           <table>
+                <tr>
+                    <th v-for="titre in head">{{titre}}</th>
+                </tr>
+                <tr v-for="(etudiant,i) in etudiants">
+                    <td v-for="elem in etudiant">{{elem}}</td>
+                    <td><button v-on:click="modify(i)">Modifier</button></td>
+                    <td><button v-on:click="suppr(i)">Supprimer</button></td>
+                </tr>
+           </table>
+       </div>
+    </div>
+
+    <script src="vue.js"></script>
+    <script src="axios.min.js"></script>
+
+    <script type="text/javascript">
+        var app = new Vue({
+            el : "#app",
+            data : {
+                head : ["Numero de l'élève","Nom de l'élève ","Note de math",'Note de phys', 'Modification', 'Suppression'],
+                etudiants : [
+                    {numEt : "11" , nom : "Andry", note_math : 44 , note_phys : 55},
+                    {numEt : "22" , nom : "Ary", note_math : 66 , note_phys : 77},
+                    {numEt : "33" , nom : "Leo", note_math : 88 , note_phys : 99},
+                    {numEt : "44" , nom : "Pen", note_math : 11 , note_phys : 22},
+                ],
+                numEt: '',
+                nom: '',
+                note_math: '',
+                note_phys: '',
+                modifier : false,
+                todo : 'Ajouter',
+            },
+            
+            methods: {
+                getEtudiants() {
+                    axios.post('/model.php', 
+                    {
+                        action: 'fetchall'
+                    })
+                    .then(function (response){
+                        console.log(response.data)
+                        app.etudiants = response.data;
+                    })
+                    .catch(function (error) {
+					console.log(error);
+				});
+                },
+                createEtudiant() {
+                    return {
+                        numEt: app.numEt,
+                        nom: app.nom,
+                        note_math: app.note_math,
+                        note_phys: app.note_phys
+                    }
+                },
+
+                resetForm() {
+                    app.numEt = '',
+                    app.nom = '',
+                    app.note_math = '',
+                    app.note_phys = ''
+                },
+
+                addEtudiant() {
+                    let etudiant = this.createEtudiant()
+
+                    axios.post('/model.php',
+                    {
+                        action: 'insert',
+                        numEt: app.numEt,
+                        nom: app.nom,
+                        note_math: app.note_math,
+                        note_phys: app.note_phys
+                    })
+                    .then((response) =>{
+                        app.etudiants.push(etudiant)
+                        this.resetForm()
+                    })
+                    .catch(function(error) {
+                        console.log(error)
+                    })
+                },
+
+                updateEtudiant(ancien, index) {
+                    let etudiant = this.createEtudiant()
+                    
+                    axios.post('/model.php',
+                    {
+                        action: 'update',
+                        numEt: app.numEt,
+                        nom: app.nom,
+                        note_math: app.note_math,
+                        note_phys: app.note_phys,
+
+                        ancientNum: ancien
+                    })
+                    .then((response)=>{
+                        app.etudiants.splice(index,1 , etudiant)
+                        this.resetForm()
+                    })
+                    .catch(function(error) {
+                        console.log(error)
+                    })
+                },
+
+                deleteEtudiant(num, index) {
+                    axios.post('/model.php',
+                    {
+                        numEt: num
+                    })
+                    .then(function(response){
+                        app.etudiants.splice(index, 1)
+                    })
+                    .catch(function(error) {
+                        console.log(error)
+                    })
+                },
+
+                modify : function(indice){
+                    this.nom = this.etudiants[indice].nom
+                    this.numEt = this.etudiants[indice].numEt
+                    this.note_math = this.etudiants[indice].note_math
+                    this.note_phys = this.etudiants[indice].note_phys
+                    this.todo = 'Modifier'
+                    this.modifier = true
+                },
+
+                boutonMA : function(){
+                    if(this.modifier){
+                        // atao refa modifier
+                    }
+                    else {
+                        // atao refa ajouter
+                        this.addEtudiant()
+                    }
+                },
+
+                reset : function(){
+                    this.nom = '',
+                    this.numEt = '',
+                    this.note_math = null,
+                    this.note_phys = null,
+                    this.modifier = false
+                    this.todo = 'Ajouter'
+                },
+
+                suppr : function(indice){
+                    // atao @le supprimer
+                }
+            },
+            mounted() {
+                this.getEtudiants()
+            }
+            
+
+        })
+    </script>
+</body>
+</html>
