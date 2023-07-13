@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head> 
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
@@ -12,12 +12,20 @@
                 <tr>
                     <th v-for="titre in head">{{titre}}</th>
                 </tr>
-                <tr v-for="elev in eleve">
+                <tr v-for="(elev,i) in eleve">
                     <td v-for="elem in elev">{{elem}}</td>
-                    <td><button>Modifier</button></td>
-                    <td><button>Supprimer</button></td>
+                    <td><button v-on:click="modify(i)">Modifier</button></td>
+                    <td><button v-on:click="suppr(i)">Supprimer</button></td>
                 </tr>
            </table>
+           <input type="text" v-bind:value="Nom">
+           <input type="text" v-bind:value="Num">
+           <input type="text" v-bind:value="Math">
+           <input type="text" v-bind:value="Phys">
+           <button v-on:click="boutonMA">{{todo}}</button>
+           <button v-on:click="reset">Reset</button>
+           <p> {{mot}} </p>
+
        </div>
     </div>
     <script src="vue.js"></script>
@@ -25,13 +33,47 @@
         var vm = new Vue({
             el : "#ell",
             data : {
+                Nom : '',
+                Num : '',
+                Math : null,
+                Phys : null,
                 head : ["Nom de l'élève","Numero de l'élève ","Note de math",'Note de phys'],
                 eleve : [
-                    {numEt : "4456" , nom : "Andry", note_math : 15 , note_phys : 15},
-                    {numEt : "645645" , nom : "Ary", note_math : 15 , note_phys : 15},
-                    {numEt : "456" , nom : "Leo", note_math : 15 , note_phys : 15},
-                    {numEt : "456" , nom : "Pen", note_math : 15 , note_phys : 15},
-                ]
+                    {numEt : "1" , nom : "Andry", note_math : 111 , note_phys : 11},
+                    {numEt : "2" , nom : "Ary", note_math : 222 , note_phys : 22},
+                    {numEt : "3" , nom : "Leo", note_math : 333 , note_phys : 33},
+                    {numEt : "4" , nom : "Pen", note_math : 444 , note_phys : 44},
+                ],
+                todo : 'Ajouter',
+                modifier : false,
+                mot : ''
+            },
+            methods : {
+
+                modify : function(indice){
+                    this.Nom = this.eleve[indice].nom
+                    this.Num = this.eleve[indice].numEt
+                    this.Math = this.eleve[indice].note_math
+                    this.Phys = this.eleve[indice].note_phys
+                    this.condi = true
+                    this.todo = 'Modifier'
+                    this.modifier = true
+                },
+                boutonMA : function(){
+                    if(this.modifier) {this.mot = "modifier"}
+                    else {this.mot = "ajouter"}
+                },
+                reset : function(){
+                    this.Nom = '',
+                    this.Num = '',
+                    this.Math = null,
+                    this.Phys = null,
+                    this.modifier = false
+                    this.todo = 'Ajouter'
+                },
+                suppr : function(indice){
+                    this.mot = 'indice ' + this.eleve[indice].nom
+                }
             }
         })
     </script>
