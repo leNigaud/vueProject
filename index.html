@@ -3,7 +3,8 @@
 <head> 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <link rel="stylesheet" href="style.css">
+    <!-- <link rel="stylesheet" href="bootstrap.css"> -->
     <style>
         table {
             border-collapse: collapse;
@@ -34,7 +35,7 @@
         </form>
         
         <div>
-           <table>
+           <table class="table">
                 <tr>
                     <th v-for="titre in head">{{titre}}</th>
                 </tr>
@@ -86,7 +87,7 @@
 
                 pattern:{ 
                     numEt: '^[0-9]+$',
-                    nom: '^[a-zA-Z]+$',
+                    nom: '^(?=.*[a-zA-Z])[a-zA-Z\\s]+$',
                     note_math: '^([01]?[0-9](\.[0-9]{1,2})?|20(\.0{1,2})?)$',
                     note_phys: '^([01]?[0-9](\.[0-9]{1,2})?|20(\.0{1,2})?)$'
                 },
@@ -123,7 +124,16 @@
                     })
                     .then(function (response){
                         console.log(response.data)
-                        app.infos = response.data;
+                        // app.infos = response.data;
+                        let data = response.data
+                        let info = {}
+                        info.moyenneClasse = parseFloat(data.moyenneClasse).toFixed(2);
+                        info.maxMoyenne = parseFloat(data.maxMoyenne).toFixed(2);
+                        info.minMoyenne = parseFloat(data.minMoyenne).toFixed(2);
+                        info.numberRedoublants = data.numberRedoublants;
+                        info.numberAdmis = data.numberAdmis;
+                        app.infos = info;
+                        
                     })
                     .catch(function (error) {
 					console.log(error);
@@ -235,7 +245,12 @@
                         // atao refa ajouter
                         app.addEtudiant()
                     }
-                    this.reset()
+                    // this.reset()
+                },
+                trimFloats() {
+                for (var key in app.infos) {
+                    parseFloat(app.infos[key]) = parseFloat(parseFloat(app.infos[key]).toFixed(2));
+                }
                 },
 
                 reset : function(){
